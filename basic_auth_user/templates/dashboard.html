@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Password Attack Lab</title>
+    <style>
+        body {
+            font-family: 'Courier New', monospace;
+            max-width: 1200px;
+            margin: 20px auto;
+            padding: 20px;
+            background: #0E1825;
+            color: #FCFCFC;
+        }
+        .container {
+            background: #2F3846;
+            padding: 20px;
+            border-radius: 10px;
+        }
+        h1 { color: #FCFCFC; }
+        
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin: 20px 0;
+        }
+        .stat-card {
+            background: #0E1825;
+            padding: 15px;
+            border-radius: 5px;
+            text-align: center;
+        }
+        .stat-value {
+            font-size: 2em;
+            font-weight: bold;
+        }
+        .success { color: #FCFCFC; }
+        .failure { color: #ff4444; }
+        .attempt {
+            padding: 8px;
+            margin: 5px 0;
+            border-left: 3px solid;
+            font-size: 13px;
+            background: #0E1825;
+        }
+        .attempt.success { border-color: #00ff41; }
+        .attempt.failure { border-color: #ff4444; }
+        .attempt.locked { border-color: #ffcc00; color: #ffcc00; }
+        pre {
+            background: #0E1825;
+            padding: 10px;
+            overflow-x: auto;
+            border-radius: 5px;
+        }
+        code {
+            color: #ce9178;
+        }
+        .refresh-btn {
+            background: #FCFCFC;
+            color: #0E1825;
+            border: none;
+            padding: 10px 20px;
+            cursor: pointer;
+            font-weight: bold;
+            margin-top: 10px;
+            border-radius: 5px;
+        }
+        .refresh-btn:hover {
+            background: #0990B8;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Password Attack Demonstration Lab</h1>
+        
+        
+        <div class="stats">
+            <div class="stat-card">
+                <div>Total Attempts</div>
+                <div class="stat-value">{{ stats.total }}</div>
+            </div>
+            <div class="stat-card">
+                <div>Successful</div>
+                <div class="stat-value success">{{ stats.successful }}</div>
+            </div>
+            <div class="stat-card">
+                <div>Failed</div>
+                <div class="stat-value failure">{{ stats.failed }}</div>
+            </div>
+        </div>
+        
+        <h2>Failed Attempts by User</h2>
+        <div class="stats">
+            {% for user, count in failed_counts.items() %}
+            <div class="stat-card">
+                <div>{{ user }}</div>
+                <div class="stat-value failure">{{ count }}</div>
+            </div>
+            {% endfor %}
+        </div>
+        
+        <h2>Live Attack Log (Last 20 attempts)</h2>
+        <div style="background: #0E1825; padding: 10px; height: 400px; overflow-y: auto;">
+            {% for attempt in attempts|reverse %}
+            <div class="attempt 
+                {% if attempt.success %}success
+                {% elif attempt.locked %}locked
+                {% else %}failure{% endif %}">
+                [{{ attempt.time }}] <strong>{{ attempt.username }}</strong>@{{ attempt.ip }} - 
+                {% if attempt.success %}
+                    SUCCESS
+                {% elif attempt.locked %}
+                    ACCOUNT LOCKED
+                {% else %}
+                    FAILED
+                {% endif %}
+                {% if attempt.password %}
+                    <span style="color: #888;">(Password: {{ attempt.password }})</span>
+                {% endif %}
+                {% if attempt.error %}
+                    <span style="color: #ffcc00;">[{{ attempt.error }}]</span>
+                {% endif %}
+            </div>
+            {% endfor %}
+        </div>
+        
+        <button class="refresh-btn" onclick="location.reload()">Refresh Dashboard</button>
+    </div>
+</body>
+</html>
